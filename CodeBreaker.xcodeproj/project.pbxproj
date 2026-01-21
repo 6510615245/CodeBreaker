@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		857DAE0A2F177D0B009A6458 /* CodeBreaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CodeBreaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		857DAE0A2F177D0B009A6458 /* CodeBreaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = CodeBreaker.app; path = /Users/6510615245/Desktop/CN436/CodeBreaker/build/Debug/CodeBreaker.app; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -33,16 +33,7 @@
 			isa = PBXGroup;
 			children = (
 				857DAE0C2F177D0B009A6458 /* CodeBreaker */,
-				857DAE0B2F177D0B009A6458 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		857DAE0B2F177D0B009A6458 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				857DAE0A2F177D0B009A6458 /* CodeBreaker.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -95,7 +86,7 @@
 			mainGroup = 857DAE012F177D0B009A6458;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 857DAE0B2F177D0B009A6458 /* Products */;
+			productRefGroup = 857DAE012F177D0B009A6458;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
