@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		857DAE0A2F177D0B009A6458 /* CodeBreaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = CodeBreaker.app; path = /Users/6510615245/Desktop/CN436/CodeBreaker/build/Debug/CodeBreaker.app; sourceTree = "<absolute>"; };
+		85DD740E2F29E7C8002EC155 /* CodeBreaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CodeBreaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -33,6 +33,7 @@
 			isa = PBXGroup;
 			children = (
 				857DAE0C2F177D0B009A6458 /* CodeBreaker */,
+				85DD740E2F29E7C8002EC155 /* CodeBreaker.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -58,7 +59,7 @@
 			packageProductDependencies = (
 			);
 			productName = CodeBreaker;
-			productReference = 857DAE0A2F177D0B009A6458 /* CodeBreaker.app */;
+			productReference = 85DD740E2F29E7C8002EC155 /* CodeBreaker.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

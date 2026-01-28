@@ -1,3 +1,11 @@
+//
+//  Code.swift
+//  CodeBreaker
+//
+//  Created by นางสาวพลอยพรรณ เต็งประยูร on 28/1/2569 BE.
+//
+
+
 import SwiftUI
 
 struct Code {
@@ -31,23 +39,42 @@ struct Code {
     }
     
     func match(against otherCode: Code) -> [Match] {
-        var results: [Match] = Array(repeating: .nomatch, count: pegs.count)
+//        var results: [Match] = Array(repeating: .nomatch, count: pegs.count)
         var pegsToMatch = otherCode.pegs
-        for index in pegs.indices.reversed() {
+        
+        let backwardsExactMatches = pegs.indices.reversed().map {
+            index in
             if pegsToMatch[index] == pegs[index] {
-                results[index] = .exact
                 pegsToMatch.remove(at: index)
+                return Match.exact
+            } else {
+                return .nomatch
             }
         }
-        for index in pegs.indices {
-            if results[index] != .exact {
-                if let matchIndex = pegsToMatch.firstIndex(of: pegs[index]) {
-                    results[index] = .inexact
-                    pegsToMatch.remove(at: matchIndex)
-                }
-                
-            }
+        let exactMatches = Array(backwardsExactMatches.reversed())
+        return pegs.indices.map { index in
+            if exactMatches[index] != .exact, let matchIndex =
+                pegsToMatch.firstIndex(of: pegs[index]){
+                pegsToMatch.remove(at: matchIndex)
+                return Match.inexact
+            } else {return exactMatches[index]}
         }
-        return results
+        
+//        for index in pegs.indices.reversed() {
+//            if pegsToMatch[index] == pegs[index] {
+//                results[index] = .exact
+//                pegsToMatch.remove(at: index)
+//            }
+//        }
+//        for index in pegs.indices {
+//            if results[index] != .exact {
+//                if let matchIndex = pegsToMatch.firstIndex(of: pegs[index]) {
+//                    results[index] = .inexact
+//                    pegsToMatch.remove(at: matchIndex)
+//                }
+//                
+//            }
+//        }
+//        return results
     }
 }
