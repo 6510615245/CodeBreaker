@@ -8,27 +8,38 @@
 import SwiftUI
 
 struct CodeBreakerView: View {
-    @State var game: CodeBreaker = CodeBreaker()
+    // MARK: Data Owned by Me
+    @State private var game: CodeBreaker = CodeBreaker()
+    @State private var selection: Int = 0
     
+    //MARK: - body
     var body: some View {
         VStack{
 //            pegs(colors: [.red, .black, .green, .orange])
 //            pegs(colors: [.red, .blue, .green, .blue])
 //            pegs(colors: [.red, .green, .blue, .orange])
 //            pegs(colors: [.orange, .black, .green, .orange])
-            
-            view(for: game.masterCode)
-                .opacity(0)
-            view(for: game.guess)
+            if game.isOver {
+                view(for: game.masterCode)
+            }
+            if !game.isOver {
+                view(for: game.guess)
+            }
+//            view(for: game.masterCode)
+//                .opacity(game.isOver ? 1 : 0)
+//            view(for: game.guess)
             
             ScrollView {
-                
                 ForEach(game.attempts.indices.reversed(), id: \.self) {
                     index in view(for: game.attempts[index])
                 }
             }
-            Button("Guess") {
-                game.attemptGuess()
+//            Button("Guess") {
+//                game.attemptGuess()
+//            }
+            PegChooserView(choices: game.pegChoices) {
+                peg in game.setGuessPeg(peg, at: selection)
+                selection = (selection + 1) % game.guess.pegs.count
             }
         }
         .padding()
@@ -37,11 +48,18 @@ struct CodeBreakerView: View {
     var guessBotton: some View {
         Button("Guess"){
             withAnimation {
+                selection = 0
                 game.attemptGuess()
             }
         }
-        .font(.system(size:80))
-        .minimumScaleFactor(0.1)
+        .font(.system(size: GuessButton.maximumFontSize))
+        .minimumScaleFactor(GuessButton.scaleFactor)
+    }
+    
+    struct GuessButton {
+        static let maximumFontSize: CGFloat = 80
+        static let minimumFontSize: CGFloat = 8
+        static let scaleFactor = minimumFontSize / maximumFontSize
     }
     
     func view(for code: Code) -> some View {
@@ -49,25 +67,7 @@ struct CodeBreakerView: View {
 //        let colors = [Color.red, .black, .green, .orange]
 //        let colors: [Color] = [.red, .black, .green, .orange]
         return HStack{
-            ForEach(code.pegs.indices, id: \.self) {
-                index in
-                RoundedRectangle(cornerRadius: 10)
-                    .overlay {
-                        if code.pegs[index] == Code.missing {
-                            RoundedRectangle(cornerRadius: 10)
-                                .strokeBorder(Color.gray)
-                        }
-                    }
-                    .contentShape(RoundedRectangle(cornerRadius: 10))
-                    .aspectRatio(1, contentMode: .fit)
-                    .foregroundColor(code.pegs[index])
-                    .onTapGesture {
-                        if code.kind == .guess {
-                            game.changeGuessPeg(at: index)
-                        }
-                    }
-            }
-        
+            CodeView(code: code,selection: $selection)
             MatchMarkers(matches: code.matches)
                 .overlay {
                     if code.kind == .guess {
