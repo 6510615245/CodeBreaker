@@ -19,6 +19,12 @@ struct CodeBreaker {
         print(masterCode.pegs)
     }
     
+    mutating func restart() {
+        masterCode.randomize(from: pegChoices)
+        guess.reset()
+        attempts.removeAll()
+    }
+    
     var isOver: Bool {
         attempts.last?.pegs == masterCode.pegs
     }

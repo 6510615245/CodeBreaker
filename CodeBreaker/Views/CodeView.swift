@@ -7,37 +7,62 @@
 
 import SwiftUI
 
-struct CodeView: View {
-//    MARK: Data in
+struct CodeView<AncillaryView>: View where AncillaryView: View{
+    //    MARK: Data in
     let code: Code
     
-//    MARK: Data Shared by Me
+    //    MARK: Data Shared by Me
     @Binding var selection: Int
+    @ViewBuilder let ancillaryView: () -> AncillaryView
     
-//    MARK: - body
+    //    MARK: Data Owned by Me
+    @Namespace private var selectionNameSpace
+    
+    init(code: Code,
+         selection: Binding<Int> = .constant(-1),
+         @ViewBuilder ancillaryView: @escaping () -> AncillaryView = { EmptyView() }) {
+        self.code = code
+        self._selection = selection
+        self.ancillaryView = ancillaryView
+    }
+    
+    //    MARK: - body
     var body: some View {
-        ForEach(code.pegs.indices, id: \.self) {
+        HStack {
+            ForEach(code.pegs.indices, id: \.self) {
             index in PegView(peg: code.pegs[index])
                 .padding(Selection.border)
                 .background {
-                    if selection == index, code.kind == .guess {
-                        Circle()
-                            .foregroundStyle(Selection.color)
+                    Group {
+                        if selection == index, code.kind == .guess {
+                            Circle()
+                                .foregroundStyle(Selection.color)
+                                .matchedGeometryEffect(id: "selection", in: selectionNameSpace)
+                        }
                     }
+                    .animation(.easeInOut(duration: 3), value: selection)
+                    
                 }
                 .onTapGesture {
                     if code.kind == .guess {
                         selection = index
                     }
                 }
+            }
+            Color.clear.aspectRatio(1, contentMode: .fit)
+                .overlay{
+                    ancillaryView()
+                }
         }
     }
+}
+
     
-    struct Selection {
+fileprivate struct Selection {
         static let border: CGFloat = 5
         static let color: Color = Color.gray(0.85)
-    }
 }
+
 
 extension Color {
     static func gray(_ brightness: CGFloat) -> Color {

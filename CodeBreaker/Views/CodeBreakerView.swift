@@ -11,43 +11,71 @@ struct CodeBreakerView: View {
     // MARK: Data Owned by Me
     @State private var game: CodeBreaker = CodeBreaker()
     @State private var selection: Int = 0
+    @State private var restarting = false
     
     //MARK: - body
     var body: some View {
-        VStack{
-//            pegs(colors: [.red, .black, .green, .orange])
-//            pegs(colors: [.red, .blue, .green, .blue])
-//            pegs(colors: [.red, .green, .blue, .orange])
-//            pegs(colors: [.orange, .black, .green, .orange])
-            if game.isOver {
-                view(for: game.masterCode)
-            }
-            if !game.isOver {
-                view(for: game.guess)
-            }
-//            view(for: game.masterCode)
-//                .opacity(game.isOver ? 1 : 0)
-//            view(for: game.guess)
-            
-            ScrollView {
-                ForEach(game.attempts.indices.reversed(), id: \.self) {
-                    index in view(for: game.attempts[index])
+        VStack {
+//                        pegs(colors: [.red, .black, .green, .orange])
+//                        pegs(colors: [.red, .blue, .green, .blue])
+//                        pegs(colors: [.red, .green, .blue, .orange])
+//                        pegs(colors: [.orange, .black, .green, .orange])
+//            if game.isOver {
+//                view(for: game.masterCode)
+//            }
+//            if !game.isOver {
+//                view(for: game.guess)
+//            }
+//                        view(for: game.masterCode)
+//                            .opacity(game.isOver ? 1 : 0)
+//                        view(for: game.guess)
+            Button("Restart") {
+                withAnimation(.easeInOut(duration: 3)) {
+                    restarting = true
+                    game.restart()
+                }
+                completion: {
+                    restarting = false
                 }
             }
-//            Button("Guess") {
-//                game.attemptGuess()
-//            }
-            PegChooserView(choices: game.pegChoices) {
-                peg in game.setGuessPeg(peg, at: selection)
-                selection = (selection + 1) % game.guess.pegs.count
+            CodeView(code: game.masterCode,)
+                    .opacity(game.isOver ? 1 : 0)
+            if !game.isOver {
+                CodeView(code: game.guess, selection: $selection) { guessBotton }
+                    .animation(nil, value: game.attempts.count)
+                    .opacity(restarting ? 0 : 1)
+            }
+                                
+            ScrollView {
+                ForEach(game.attempts.indices.reversed(), id: \.self) {
+                    index in CodeView(code: game.attempts[index]) {
+                        MatchMarkers(matches: game.attempts[index].matches)
+                    }
+                    .transition(
+                        AnyTransition.asymmetric(
+//                            insertion: .move(edge: .top),
+                            insertion: game.isOver ? .opacity : .move(edge: .top),
+                            removal: .move(edge: .trailing))
+                        )
+                            
+                }
+            }
+            if !game.isOver {
+                PegChooserView(choices: game.pegChoices) {
+                    peg in game.setGuessPeg(peg, at: selection)
+                    selection = (selection + 1) % game.guess.pegs.count
+                }
+                .transition(AnyTransition.offset(x: 0, y: 250))
+                
             }
         }
         .padding()
     }
     
+    
     var guessBotton: some View {
         Button("Guess"){
-            withAnimation {
+            withAnimation(.easeInOut(duration: 3)) {
                 selection = 0
                 game.attemptGuess()
             }
@@ -62,22 +90,22 @@ struct CodeBreakerView: View {
         static let scaleFactor = minimumFontSize / maximumFontSize
     }
     
-    func view(for code: Code) -> some View {
-//        let colors: Array<Color> = [.red, .black, .green, .orange]
-//        let colors = [Color.red, .black, .green, .orange]
-//        let colors: [Color] = [.red, .black, .green, .orange]
-        return HStack{
-            CodeView(code: code,selection: $selection)
-            MatchMarkers(matches: code.matches)
-                .overlay {
-                    if code.kind == .guess {
-                        guessBotton
-                    }
-                }
-            
-            
-        }
-    }
+//    func view(for code: Code) -> some View {
+////        let colors: Array<Color> = [.red, .black, .green, .orange]
+////        let colors = [Color.red, .black, .green, .orange]
+////        let colors: [Color] = [.red, .black, .green, .orange]
+//        return HStack{
+//            CodeView(code: code,selection: $selection)
+//            MatchMarkers(matches: code.matches)
+//                .overlay {
+//                    if code.kind == .guess {
+//                        guessBotton
+//                    }
+//                }
+//            
+//            
+//        }
+//    }
     
 }
 
