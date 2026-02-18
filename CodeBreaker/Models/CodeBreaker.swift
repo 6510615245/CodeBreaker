@@ -10,19 +10,26 @@ import SwiftUI
 typealias Peg = Color
 
 struct CodeBreaker {
-    var masterCode: Code = Code(kind: .master)
+    var masterCode: Code = Code(kind: .master(isHidden: true))
     var guess: Code = Code(kind: .guess)
     var attempts: [Code] = []
     let pegChoices: [Peg] = [.red, .green, .yellow, .blue, .brown]
+    var startTime: Date = Date.now
+    var endTime: Date?
+    
+    
     init() {
         masterCode.randomize(from: pegChoices)
         print(masterCode.pegs)
     }
     
     mutating func restart() {
+        masterCode.kind = .master(isHidden: true)
         masterCode.randomize(from: pegChoices)
         guess.reset()
         attempts.removeAll()
+        startTime = .now
+        endTime = nil
     }
     
     var isOver: Bool {
@@ -43,9 +50,10 @@ struct CodeBreaker {
         attempt.kind = .attempt(guess.match(against: masterCode))
         attempts.append(attempt)
         guess.reset()
-//        if isOver {
-//            
-//        }
+        if isOver {
+            masterCode.kind = .master(isHidden: false)
+            endTime = .now
+        }
     }
     
     mutating func setGuessPeg(_ peg: Peg, at index: Int) {

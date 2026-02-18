@@ -12,7 +12,8 @@ struct CodeBreakerView: View {
     @State private var game: CodeBreaker = CodeBreaker()
     @State private var selection: Int = 0
     @State private var restarting = false
-    
+    @State private var hideMostRecentMarkers = false
+  
     //MARK: - body
     var body: some View {
         VStack {
@@ -30,33 +31,40 @@ struct CodeBreakerView: View {
 //                            .opacity(game.isOver ? 1 : 0)
 //                        view(for: game.guess)
             Button("Restart") {
-                withAnimation(.easeInOut(duration: 3)) {
+                withAnimation(.restart) {
                     restarting = true
                     game.restart()
                 }
                 completion: {
-                    restarting = false
+                    withAnimation(.restart) {
+                        restarting = false
+                    }
                 }
             }
-            CodeView(code: game.masterCode,)
-                    .opacity(game.isOver ? 1 : 0)
-            if !game.isOver {
-                CodeView(code: game.guess, selection: $selection) { guessBotton }
-                    .animation(nil, value: game.attempts.count)
-                    .opacity(restarting ? 0 : 1)
+            CodeView(code: game.masterCode) {
+                ElapsedTime(
+                    startTime:game.startTime,
+                    endTime: game.endTime)
+                .flexibleSystemFont()
+                .monospaced()
+                .lineLimit(1)
             }
-                                
             ScrollView {
+                if !game.isOver {
+                CodeView(code: game.guess, selection: $selection) { guessBotton }
+//                    .animation(nil, value: game.attempts.count)
+                    .opacity(restarting ? 0 : 1)
+                }
+                                
+            
                 ForEach(game.attempts.indices.reversed(), id: \.self) {
                     index in CodeView(code: game.attempts[index]) {
-                        MatchMarkers(matches: game.attempts[index].matches)
+                        let showMarkers = !hideMostRecentMarkers || index != game.attempts.count - 1
+                        if showMarkers {
+                            MatchMarkers(matches: game.attempts[index].matches)
+                        }
                     }
-                    .transition(
-                        AnyTransition.asymmetric(
-//                            insertion: .move(edge: .top),
-                            insertion: game.isOver ? .opacity : .move(edge: .top),
-                            removal: .move(edge: .trailing))
-                        )
+                    .transition(.attempt(game.isOver))
                             
                 }
             }
@@ -65,7 +73,7 @@ struct CodeBreakerView: View {
                     peg in game.setGuessPeg(peg, at: selection)
                     selection = (selection + 1) % game.guess.pegs.count
                 }
-                .transition(AnyTransition.offset(x: 0, y: 250))
+                .transition(AnyTransition.pegChooser)
                 
             }
         }
@@ -75,20 +83,25 @@ struct CodeBreakerView: View {
     
     var guessBotton: some View {
         Button("Guess"){
-            withAnimation(.easeInOut(duration: 3)) {
+            withAnimation(.guess) {
                 selection = 0
                 game.attemptGuess()
+                hideMostRecentMarkers = true
+            } completion: {
+                withAnimation(.guess) {
+                    hideMostRecentMarkers = false
+                }
             }
         }
-        .font(.system(size: GuessButton.maximumFontSize))
-        .minimumScaleFactor(GuessButton.scaleFactor)
+//        .font(.system(size: GuessButton.maximumFontSize))
+//        .minimumScaleFactor(GuessButton.scaleFactor)
     }
     
-    struct GuessButton {
-        static let maximumFontSize: CGFloat = 80
-        static let minimumFontSize: CGFloat = 8
-        static let scaleFactor = minimumFontSize / maximumFontSize
-    }
+//    struct GuessButton {
+//        static let maximumFontSize: CGFloat = 80
+//        static let minimumFontSize: CGFloat = 8
+//        static let scaleFactor = minimumFontSize / maximumFontSize
+//    }
     
 //    func view(for code: Code) -> some View {
 ////        let colors: Array<Color> = [.red, .black, .green, .orange]
@@ -108,6 +121,8 @@ struct CodeBreakerView: View {
 //    }
     
 }
+
+
 
 #Preview {
     CodeBreakerView()

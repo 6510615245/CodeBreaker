@@ -16,12 +16,12 @@ struct PegView: View {
         let pegShape = Circle()
 //        RoundedRectangle(cornerRadius: 10)
         pegShape
-                .overlay {
-                    if peg == Code.missing {
-                        pegShape
-                            .strokeBorder(Color.gray)
-                    }
-                }
+//                .overlay {
+//                    if peg == Code.missing {
+//                        pegShape
+//                            .strokeBorder(Color.gray)
+//                    }
+//                }
                 .contentShape(pegShape) // click area
                 .aspectRatio(1, contentMode: .fit)
                 .foregroundColor(peg)
