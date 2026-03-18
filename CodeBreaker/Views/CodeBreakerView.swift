@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct CodeBreakerView: View {
+    // MARK: Data Shared with Me
+    let game: CodeBreaker
+    
     // MARK: Data Owned by Me
-    @State private var game: CodeBreaker = CodeBreaker()
     @State private var selection: Int = 0
     @State private var restarting = false
     @State private var hideMostRecentMarkers = false
@@ -30,25 +32,8 @@ struct CodeBreakerView: View {
 //                        view(for: game.masterCode)
 //                            .opacity(game.isOver ? 1 : 0)
 //                        view(for: game.guess)
-            Button("Restart") {
-                withAnimation(.restart) {
-                    restarting = true
-                    game.restart()
-                }
-                completion: {
-                    withAnimation(.restart) {
-                        restarting = false
-                    }
-                }
-            }
-            CodeView(code: game.masterCode) {
-                ElapsedTime(
-                    startTime:game.startTime,
-                    endTime: game.endTime)
-                .flexibleSystemFont()
-                .monospaced()
-                .lineLimit(1)
-            }
+      
+            CodeView(code: game.masterCode)
             ScrollView {
                 if !game.isOver {
                 CodeView(code: game.guess, selection: $selection) { guessBotton }
@@ -57,11 +42,11 @@ struct CodeBreakerView: View {
                 }
                                 
             
-                ForEach(game.attempts.indices.reversed(), id: \.self) {
-                    index in CodeView(code: game.attempts[index]) {
-                        let showMarkers = !hideMostRecentMarkers || index != game.attempts.count - 1
+                ForEach(game.attempts, id: \.pegs) {
+                    attempt in CodeView(code: attempt) {
+                        let showMarkers = !hideMostRecentMarkers || attempt.pegs != game.attempts.first?.pegs
                         if showMarkers {
-                            MatchMarkers(matches: game.attempts[index].matches)
+                            MatchMarkers(matches: attempt.matches)
                         }
                     }
                     .transition(.attempt(game.isOver))
@@ -75,6 +60,29 @@ struct CodeBreakerView: View {
                 }
                 .transition(AnyTransition.pegChooser)
                 
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button("Restart", systemImage: "arrow.circlepath") {
+                    withAnimation(.restart) {
+                        restarting = true
+                        game.restart()
+                    }
+                    completion: {
+                        withAnimation(.restart) {
+                            restarting = false
+                        }
+                    }
+                }
+            }
+            ToolbarItem(placement: .automatic) {
+                ElapsedTime(
+                    startTime:game.startTime,
+                    endTime: game.endTime)
+                .flexibleSystemFont()
+                .monospaced()
+                .lineLimit(1)
             }
         }
         .padding()
@@ -125,5 +133,8 @@ struct CodeBreakerView: View {
 
 
 #Preview {
-    CodeBreakerView()
+    @Previewable @State var game = CodeBreaker(name: "Preview", pegChoices: [.blue, .red, .orange])
+    NavigationStack {
+        CodeBreakerView(game: game)
+    }
 }

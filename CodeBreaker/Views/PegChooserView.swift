@@ -16,7 +16,7 @@ struct PegChooserView: View {
 //    let game: CodeBreaker
     
 //     MARK: Data Out Function
-    let onChoose: (Peg) -> Void
+    var onChoose: ((Peg) -> Void)?
     
 //    MARK: - body
     var body: some View {
@@ -26,7 +26,7 @@ struct PegChooserView: View {
                     .onTapGesture {
 //                        game.setGuessPeg(peg, at: selection)
 //                        selection = (selection + 1) % pegCount
-                        onChoose(peg)
+                        onChoose?(peg)
                     }
             }
         }

@@ -41,7 +41,7 @@ struct CodeView<AncillaryView>: View where AncillaryView: View{
                                 .matchedGeometryEffect(id: "selection", in: selectionNameSpace)
                         }
                     }
-                    .animation(.easeInOut(duration: 3), value: selection)
+                    .animation(.selection, value: selection)
                     
                 }
                 .overlay {

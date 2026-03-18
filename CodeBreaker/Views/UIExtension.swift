@@ -8,7 +8,7 @@
 import SwiftUI
 
 extension Animation {
-    static let codeBreaker = Animation.bouncy.speed(0.75)
+    static let codeBreaker = Animation.spring.speed(0.75)
     static let restart = Animation.codeBreaker
     static let guess =  Animation.codeBreaker
     static let selection =  Animation.codeBreaker
