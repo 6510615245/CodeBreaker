@@ -14,7 +14,7 @@ typealias Peg = Color
     var masterCode: Code = Code(kind: .master(isHidden: true))
     var guess: Code = Code(kind: .guess, pegs:[Code.missing, Code.missing, Code.missing, Code.missing])
     var attempts: [Code] = []
-    let pegChoices: [Peg]
+    var pegChoices: [Peg]
     var startTime: Date = Date.now
     var endTime: Date?
     
@@ -37,6 +37,10 @@ typealias Peg = Color
     
     var isOver: Bool {
         attempts.first?.pegs == masterCode.pegs
+    }
+    
+    var isValid: Bool {
+        !name.isEmpty && Set(pegChoices).count >= 2
     }
     
     func changeGuessPeg(at index: Int){
