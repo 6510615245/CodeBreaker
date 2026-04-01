@@ -15,52 +15,34 @@ struct CodeBreakerView: View {
     @State private var selection: Int = 0
     @State private var restarting = false
     @State private var hideMostRecentMarkers = false
-  
-    //MARK: - body
+    
+    // MARK: - body
     var body: some View {
         VStack {
-//                        pegs(colors: [.red, .black, .green, .orange])
-//                        pegs(colors: [.red, .blue, .green, .blue])
-//                        pegs(colors: [.red, .green, .blue, .orange])
-//                        pegs(colors: [.orange, .black, .green, .orange])
-//            if game.isOver {
-//                view(for: game.masterCode)
-//            }
-//            if !game.isOver {
-//                view(for: game.guess)
-//            }
-//                        view(for: game.masterCode)
-//                            .opacity(game.isOver ? 1 : 0)
-//                        view(for: game.guess)
-      
             CodeView(code: game.masterCode)
             ScrollView {
                 if !game.isOver {
-                CodeView(code: game.guess, selection: $selection) { guessBotton }
-//                    .animation(nil, value: game.attempts.count)
-                    .opacity(restarting ? 0 : 1)
+                    CodeView(code: game.guess, selection: $selection) { guessButton }
+//                        .animation(nil, value: game.attempts.count)
+                        .opacity(restarting ? 0 : 1)
                 }
-                                
-            
-                ForEach(game.attempts, id: \.pegs) {
-                    attempt in CodeView(code: attempt) {
+                ForEach(game.attempts, id: \.pegs) { attempt in
+                    CodeView(code: attempt) {
                         let showMarkers = !hideMostRecentMarkers || attempt.pegs != game.attempts.first?.pegs
                         if showMarkers {
                             MatchMarkers(matches: attempt.matches)
                         }
                     }
                     .transition(.attempt(game.isOver))
-                            
                 }
             }
             if !game.isOver {
-                PegChooserView(choices: game.pegChoices) {
-                    peg in game.setGuessPeg(peg, at: selection)
+                PegChooserView(choices: game.pegChoices) { peg in
+                    game.setGuessPeg(peg, at: selection)
                     selection = (selection + 1) % game.guess.pegs.count
                 }
                 .frame(maxHeight: 80)
                 .transition(.pegChooser)
-                
             }
         }
         .toolbar {
@@ -69,8 +51,7 @@ struct CodeBreakerView: View {
                     withAnimation(.restart) {
                         restarting = true
                         game.restart()
-                    }
-                    completion: {
+                    } completion: {
                         withAnimation(.restart) {
                             restarting = false
                         }
@@ -79,8 +60,9 @@ struct CodeBreakerView: View {
             }
             ToolbarItem(placement: .automatic) {
                 ElapsedTime(
-                    startTime:game.startTime,
-                    endTime: game.endTime)
+                    startTime: game.startTime,
+                    endTime: game.endTime
+                )
                 .flexibleSystemFont()
                 .monospaced()
                 .lineLimit(1)
@@ -89,9 +71,8 @@ struct CodeBreakerView: View {
         .padding()
     }
     
-    
-    var guessBotton: some View {
-        Button("Guess"){
+    var guessButton: some View {
+        Button("Guess") {
             withAnimation(.guess) {
                 selection = 0
                 game.attemptGuess()
@@ -102,8 +83,7 @@ struct CodeBreakerView: View {
                 }
             }
         }
-//        .font(.system(size: GuessButton.maximumFontSize))
-//        .minimumScaleFactor(GuessButton.scaleFactor)
+        .flexibleSystemFont()
     }
     
 //    struct GuessButton {
@@ -111,30 +91,20 @@ struct CodeBreakerView: View {
 //        static let minimumFontSize: CGFloat = 8
 //        static let scaleFactor = minimumFontSize / maximumFontSize
 //    }
-    
-//    func view(for code: Code) -> some View {
-////        let colors: Array<Color> = [.red, .black, .green, .orange]
-////        let colors = [Color.red, .black, .green, .orange]
-////        let colors: [Color] = [.red, .black, .green, .orange]
-//        return HStack{
-//            CodeView(code: code,selection: $selection)
-//            MatchMarkers(matches: code.matches)
-//                .overlay {
-//                    if code.kind == .guess {
-//                        guessBotton
-//                    }
-//                }
-//            
-//            
-//        }
-//    }
-    
 }
 
+extension CodeBreaker {
+    convenience init(name: String, pegChoices: [Color]) {
+        self.init(name: name, pegChoices: pegChoices.map(\.hex))
+    }
+    var pegColorChoices: [Color] {
+        get { pegChoices.map { Color(hex: $0 )} }
+        set { pegChoices = newValue.map(\.hex) }
+    }
+}
 
-
-#Preview {
-    @Previewable @State var game = CodeBreaker(name: "Preview", pegChoices: [.blue, .red, .orange])
+#Preview(traits: .swiftData) {
+    @Previewable @State var game = CodeBreaker(name: "Preview", pegChoices: [.blue,.red,.orange])
     NavigationStack {
         CodeBreakerView(game: game)
     }

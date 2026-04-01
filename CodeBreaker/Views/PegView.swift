@@ -24,13 +24,13 @@ struct PegView: View {
 //                }
                 .contentShape(pegShape) // click area
                 .aspectRatio(1, contentMode: .fit)
-                .foregroundColor(peg)
+                .foregroundColor(Color(hex:peg))
             
         
     }
 }
 
 #Preview {
-    PegView(peg: .red)
+    PegView(peg: Color.red.hex)
         .padding()
 }

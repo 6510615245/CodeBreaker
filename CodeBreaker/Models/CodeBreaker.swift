@@ -5,21 +5,22 @@
 //  Created by นางสาวพลอยพรรณ เต็งประยูร on 21/1/2569 BE.
 //
 
-import SwiftUI
+import Foundation
+import SwiftData
 
-typealias Peg = Color
+typealias Peg = String
 
-@Observable class CodeBreaker {
+@Model class CodeBreaker {
     var name: String
-    var masterCode: Code = Code(kind: .master(isHidden: true))
-    var guess: Code = Code(kind: .guess, pegs:[Code.missing, Code.missing, Code.missing, Code.missing])
-    var attempts: [Code] = []
+    @Relationship(deleteRule: .cascade) var masterCode: Code = Code(kind: .master(isHidden: true))
+    @Relationship(deleteRule: .cascade) var guess: Code = Code(kind: .guess, pegs:[Code.missing, Code.missing, Code.missing, Code.missing])
+    @Relationship(deleteRule: .cascade) var attempts: [Code] = []
     var pegChoices: [Peg]
-    var startTime: Date = Date.now
+    @Transient var startTime: Date = .now
     var endTime: Date?
     
     
-    init(name: String = "Code Breaker", pegChoices: [Peg] = [.red, .green, .yellow, .blue, .brown]) {
+    init(name: String = "Code Breaker", pegChoices: [Peg]) {
         self.name = name
         self.pegChoices = pegChoices
         masterCode.randomize(from: pegChoices)
@@ -54,8 +55,7 @@ typealias Peg = Color
     
     func attemptGuess() {
         guard !attempts.contains(where : {$0.pegs == guess.pegs}) else { return }
-        var attempt = guess
-        attempt.kind = .attempt(guess.match(against: masterCode))
+        let attempt = Code(kind: .attempt(guess.match(against: masterCode)), pegs: guess.pegs)
         attempts.insert(attempt, at: 0)
         guess.reset()
         if isOver {

@@ -17,41 +17,27 @@ struct GameEditorView: View {
     
     // MARK: Action Function
     let onChoose: () -> Void
-    
-    // MARK: -Body
+
+    // MARK: - body
     var body: some View {
         NavigationStack {
             Form {
                 Section("Name") {
                     TextField("Name", text: $game.name)
                 }
-                Section ("Pegs") {
-                    List {
-                        ForEach(game.pegChoices.indices, id: \.self) { index in
-                            ColorPicker(
-                                selection: $game.pegChoices[index],
-                                supportsOpacity: false
-                            ) {
-                                button("Peg Choice \(index+1)", systemImage: "minus.circle", color: .red) {
-                                    game.pegChoices.remove(at: index)
-                                }
-                            }
-                        }
-                        button("Add Peg", systemImage: "plus.circle", color: .green) {
-                            game.pegChoices.append(.red)
-                        }
-                    }
+                Section("Pegs") {
+                    PegChoicesChooserView(pegChoices: $game.pegColorChoices)
                 }
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
-                       dismiss()
+                        dismiss()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
-                        if game.isValid{
+                        if game.isValid {
                             onChoose()
                             dismiss()
                         } else {
@@ -59,27 +45,12 @@ struct GameEditorView: View {
                         }
                     }
                     .alert("Invalid Game", isPresented: $showInvalidGameAlert) {
+                        
                     } message: {
                         Text("A game must have a name and more than one unique peg.")
                     }
                 }
             }
-        }
-    }
-    
-    func button(
-        _ title: String,
-        systemImage: String,
-        color: Color,
-        action: @escaping () -> Void
-    )  -> some View {
-        HStack {
-            Button{
-                action()
-            } label: {
-                Image(systemName: systemImage).tint(color)
-            }
-            Text(title)
         }
     }
 }
@@ -88,6 +59,6 @@ struct GameEditorView: View {
     @Previewable var game = CodeBreaker(name: "Preview", pegChoices: [.red, .blue])
     GameEditorView(game: game) {
         print("game name changed to \(game.name)")
-        print("game name changed to \(game.pegChoices)")
+        print("game pegs changed to \(game.pegChoices)")
     }
 }
