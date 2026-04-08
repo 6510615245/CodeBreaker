@@ -14,11 +14,16 @@ typealias Peg = String
     var name: String
     @Relationship(deleteRule: .cascade) var masterCode: Code = Code(kind: .master(isHidden: true))
     @Relationship(deleteRule: .cascade) var guess: Code = Code(kind: .guess, pegs:[Code.missing, Code.missing, Code.missing, Code.missing])
-    @Relationship(deleteRule: .cascade) var attempts: [Code] = []
+    @Relationship(deleteRule: .cascade) var _attempts: [Code] = []
     var pegChoices: [Peg]
     @Transient var startTime: Date = .now
     var endTime: Date?
+    var lastAttemptDate: Date? = Date.now
     
+    var attempts: [Code] {
+        get { _attempts.sorted { $0.timestamp < $1.timestamp }}
+        set { _attempts = newValue }
+    }
     
     init(name: String = "Code Breaker", pegChoices: [Peg]) {
         self.name = name
@@ -57,6 +62,7 @@ typealias Peg = String
         guard !attempts.contains(where : {$0.pegs == guess.pegs}) else { return }
         let attempt = Code(kind: .attempt(guess.match(against: masterCode)), pegs: guess.pegs)
         attempts.insert(attempt, at: 0)
+        lastAttemptDate = .now
         guess.reset()
         if isOver {
             masterCode.kind = .master(isHidden: false)
@@ -66,6 +72,17 @@ typealias Peg = String
     
     func setGuessPeg(_ peg: Peg, at index: Int) {
         guess.pegs[index] = peg
+    }
+    
+    enum SortOption: CaseIterable {
+        case name
+        case recent
+        var title: String {
+            switch self {
+                case .name: "Sort by Name"
+                case .recent: "Recent"
+            }
+        }
     }
 }
 
